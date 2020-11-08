@@ -14,7 +14,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           entities: [Token, User],
           synchronize: true,
           migrationsRun: true,
-          logging: true,
+          logging: false,
         };
 
         if (configService.get<string>('ENV') === 'Development') {
