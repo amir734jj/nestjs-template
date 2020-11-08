@@ -2,15 +2,38 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Token } from '../models/token.model';
 import { User } from '../models/users.model';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'database.sqlite',
-      entities: [Token, User],
-      synchronize: true,
-      migrationsRun: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const defaultOptions = {
+          entities: [Token, User],
+          synchronize: true,
+          migrationsRun: true,
+          logging: true,
+        };
+
+        if (configService.get<string>('ENV') === 'Development') {
+          return {
+            ...defaultOptions,
+            type: 'sqlite',
+            database: 'database.sqlite',
+          };
+        } else {
+          return {
+            ...defaultOptions,
+            type: 'postgres',
+            url: configService.get<string>('DATABASE_URL'),
+            extra: {
+              ssl: true,
+            },
+          };
+        }
+      },
     }),
   ],
 })

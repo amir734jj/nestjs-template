@@ -40,9 +40,11 @@ class AuthService {
       const token = await this.createUniqueToken(user);
       await this.tokenService.save({
         value: token,
-        expiresIn: DateTime.local().plus({
-          minute: this.configService.get<number>('JWT_EXPIRES'),
-        }),
+        expiresIn: DateTime.local()
+          .plus({
+            minute: this.configService.get<number>('JWT_EXPIRES'),
+          })
+          .toJSDate(),
         user,
       });
 
@@ -91,7 +93,7 @@ class AuthService {
   private async cleanUpUniqueTokens(tokens: Token[]) {
     await Promise.all(
       tokens
-        .filter((x) => DateTime.local().greaterThan(x.expiresIn))
+        .filter((x) => DateTime.local() <= DateTime.fromJSDate(x.expiresIn))
         .map((x) => this.tokenService.delete(x.id)),
     );
   }
