@@ -2,6 +2,10 @@ import { IsString, IsNotEmpty, IsEmail } from 'class-validator';
 import { LoginUserDto } from './login.user.dto';
 
 export class CreateUserDto extends LoginUserDto {
+  @IsString()
+  @IsNotEmpty()
+  public username: string;
+
   @IsEmail()
   @IsNotEmpty()
   public email: string;

@@ -9,7 +9,7 @@ export abstract class AbstractDal<T> implements BasicCrud<T> {
   includes: string[] = [];
 
   public async all(): Promise<T[]> {
-    return this.repository.find();
+    return this.repository.find({ relations: this.includes, cache: true });
   }
 
   public async get(id: number): Promise<T> {
@@ -17,7 +17,11 @@ export abstract class AbstractDal<T> implements BasicCrud<T> {
   }
 
   public async find(props: Partial<T>): Promise<T> {
-    return this.repository.findOne({ where: props, relations: this.includes });
+    return this.repository.findOne({
+      where: props,
+      relations: this.includes,
+      cache: true,
+    });
   }
 
   public async save(partial: Partial<T>): Promise<T> {
