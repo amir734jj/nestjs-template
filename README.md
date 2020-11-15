@@ -9,6 +9,7 @@ Features:
 - JWT Bearer Token with local store and multiple session support
 - Basic CRUD data-access-layer and controllers
 - Swagger and DTO schema validation
+- IoC setup with separate modules
 
 Libraries:
 - TypeORM (Sqlite and Postgres depending on environment)
