@@ -21,6 +21,7 @@ async function bootstrap() {
     .setDescription('Simple MVC application')
     .setVersion('1.0')
     .addTag('user')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, options);

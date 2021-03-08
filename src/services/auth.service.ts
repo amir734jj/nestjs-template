@@ -7,7 +7,7 @@ import { CreateUserDto } from '../dtos/create.user.dto';
 import { LogoutUserDto } from '../dtos/logout.user.dto';
 import { User } from '../models/users.model';
 import TokenService from './token.service';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as _ from 'lodash';
@@ -38,7 +38,7 @@ class AuthService {
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       await this.cleanUpUniqueTokens(user.tokens);
       const token = await this.createUniqueToken(user);
-      await this.tokenService.save({
+      const tk = await this.tokenService.save({
         value: token,
         expiresIn: DateTime.local()
           .plus({
@@ -54,7 +54,10 @@ class AuthService {
         token,
       };
 
-      return this.jwtService.sign(dataStoredInToken);
+      return await this.jwtService.signAsync(dataStoredInToken, {
+        expiresIn: '1h',
+        secret: "B796A1F7773FDFA9F051457B0AA10D0872A94EDA4925D73839EE5029124245BB"
+      });
     }
     return null;
   }
@@ -73,16 +76,39 @@ class AuthService {
     username,
   }: DataStoredInToken): Promise<User> {
     const user = await this.userService.find({ id, username });
-    if (user && user.tokens.find((x) => x.value === token)) {
+    let tk: Token;
+    if (user && (tk = user.tokens.find((x) => x.value === token))) {
+      const minutesToExpire = DateTime.fromJSDate(tk.expiresIn)
+        .diff(DateTime.local())
+        .as('minutes');
+      if (minutesToExpire <= 5) {
+        Logger.log('Triggering token refresh');
+        await this.refreshToken(tk);
+      }
       return user;
     }
 
+    Logger.log('Token not found');
     return null;
+  }
+
+  public async refreshToken(token: Token) {
+    await this.tokenService.save({
+      ...token,
+      expiresIn: DateTime.local()
+        .plus({
+          minute: this.configService.get<number>('JWT_EXPIRES'),
+        })
+        .toJSDate(),
+    });
+
+    Logger.log('Token successfully refreshed');
   }
 
   private async createUniqueToken(user: User): Promise<string> {
     return await bcrypt.hash(
       _.toString({
+        random: Math.random(), // hacky
         username: user.username,
         password: user.password,
       }),
@@ -93,7 +119,12 @@ class AuthService {
   private async cleanUpUniqueTokens(tokens: Token[]) {
     await Promise.all(
       tokens
-        .filter((x) => DateTime.local() <= DateTime.fromJSDate(x.expiresIn))
+        .filter(
+          ({ expiresIn }) =>
+            DateTime.fromJSDate(expiresIn)
+              .diff(DateTime.local())
+              .as('minutes') < 0,
+        )
         .map((x) => this.tokenService.delete(x.id)),
     );
   }

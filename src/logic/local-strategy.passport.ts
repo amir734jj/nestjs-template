@@ -17,6 +17,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     });
   }
 
+  // noinspection JSUnusedGlobalSymbols
   async validate(payload: any): Promise<any> {
     const user = await this.authService.challenge(payload);
     if (!user) {
