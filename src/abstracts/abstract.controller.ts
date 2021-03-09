@@ -1,4 +1,12 @@
-import { Body, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+} from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
 import BasiCrud from '../interfaces/crud.interface';
 
@@ -11,7 +19,13 @@ export abstract class AbstractController<T> {
     description: 'Successfully returned a matching record',
   })
   async get(@Param('id') id: number): Promise<T> {
-    return await this.service.get(id);
+    const result = await this.service.get(id);
+
+    if (!result) {
+      throw new NotFoundException();
+    }
+
+    return result;
   }
 
   @Get()
@@ -33,7 +47,7 @@ export abstract class AbstractController<T> {
   }
 
   @Post()
-  @ApiResponse({ status: 200, description: 'Successfully saved a new record' })
+  @ApiResponse({ status: 201, description: 'Successfully saved a new record' })
   async save(@Body() question: T): Promise<T> {
     return this.service.save(question);
   }
