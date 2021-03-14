@@ -12,6 +12,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as _ from 'lodash';
 import { Token } from '../models/token.model';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import * as ms from 'ms';
 
 @Injectable()
 class AuthService {
@@ -38,11 +41,11 @@ class AuthService {
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       await this.cleanUpUniqueTokens(user.tokens);
       const token = await this.createUniqueToken(user);
-      const tk = await this.tokenService.save({
+      await this.tokenService.save({
         value: token,
         expiresIn: DateTime.local()
           .plus({
-            minute: this.configService.get<number>('JWT_EXPIRES'),
+            millisecond: ms(this.configService.get<string>('JWT_EXPIRES')),
           })
           .toJSDate(),
         user,
@@ -54,10 +57,7 @@ class AuthService {
         token,
       };
 
-      return await this.jwtService.signAsync(dataStoredInToken, {
-        expiresIn: '1h',
-        secret: "B796A1F7773FDFA9F051457B0AA10D0872A94EDA4925D73839EE5029124245BB"
-      });
+      return await this.jwtService.signAsync(dataStoredInToken);
     }
     return null;
   }

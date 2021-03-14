@@ -20,7 +20,7 @@ import { AccountController } from '../controllers/account.controller';
       useFactory: async (configService: ConfigService) => {
         return {
           secret: configService.get<string>('JWT_SECRET'),
-          signOptions: { expiresIn: '1h' },
+          signOptions: { expiresIn: configService.get<string>('JWT_EXPIRES') },
         };
       },
     }),
