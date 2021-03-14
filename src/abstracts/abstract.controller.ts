@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Delete,
   Get,
@@ -43,13 +44,25 @@ export abstract class AbstractController<T> {
     description: 'Successfully deleted a matching record',
   })
   async delete(@Param('id') id: number): Promise<T> {
-    return this.service.delete(id);
+    const result = await this.service.delete(id);
+
+    if (!result) {
+      throw new BadRequestException(`Delete with id ${id} failed`);
+    }
+
+    return result;
   }
 
   @Post()
   @ApiResponse({ status: 201, description: 'Successfully saved a new record' })
   async save(@Body() question: T): Promise<T> {
-    return this.service.save(question);
+    const result = await this.service.save(question);
+
+    if (!result) {
+      throw new BadRequestException('Save failed');
+    }
+
+    return result;
   }
 
   @Put(':id')
@@ -58,6 +71,12 @@ export abstract class AbstractController<T> {
     description: 'Successfully updated matching record',
   })
   async update(@Param('id') id: number, @Body() question: T): Promise<T> {
-    return this.service.update(id, question);
+    const result = await this.service.update(id, question);
+
+    if (!result) {
+      throw new BadRequestException(`Update with id ${id} failed`);
+    }
+
+    return result;
   }
 }

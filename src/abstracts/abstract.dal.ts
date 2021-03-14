@@ -9,15 +9,18 @@ export abstract class AbstractDal<T> implements BasicCrud<T> {
   includes: string[] = [];
 
   public async all(): Promise<T[]> {
-    return this.repository.find({ relations: this.includes, cache: true });
+    return await this.repository.find({
+      relations: this.includes,
+      cache: true,
+    });
   }
 
   public async get(id: number): Promise<T> {
-    return this.repository.findOne(id);
+    return await this.repository.findOne(id);
   }
 
   public async find(props: Partial<T>): Promise<T> {
-    return this.repository.findOne({
+    return await this.repository.findOne({
       where: props,
       relations: this.includes,
       cache: true,
@@ -25,12 +28,12 @@ export abstract class AbstractDal<T> implements BasicCrud<T> {
   }
 
   public async save(partial: Partial<T>): Promise<T> {
-    return this.repository.save(this.resolver(partial));
+    return await this.repository.save(this.resolver(partial));
   }
 
   public async update(userId: number, partial: Partial<T>): Promise<T> {
     await this.repository.update(userId, this.resolver(partial));
-    return this.repository.findOne(userId);
+    return await this.repository.findOne(userId);
   }
 
   public async delete(id: number): Promise<T> {
