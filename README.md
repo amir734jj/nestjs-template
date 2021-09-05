@@ -1,4 +1,4 @@
-# ts-webapp-boilerplate
+# nestjs-template
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
 
