@@ -1,6 +1,6 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class LogoutUserDto {
+export default class LogoutUserDto {
   @IsString()
   @IsNotEmpty()
   public token: string;

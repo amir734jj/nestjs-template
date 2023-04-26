@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
-import { User } from './users.model';
+import User from './users.model';
 import { Exclude } from 'class-transformer';
+import IEntity from 'src/interfaces/entity.interface';
 
 @Entity()
-export class Token {
+export default class Token implements IEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

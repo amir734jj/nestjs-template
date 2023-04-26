@@ -1,12 +1,12 @@
 import { Repository } from 'typeorm';
 import { AbstractDal } from '../abstracts/abstract.dal';
 import * as _ from 'lodash';
-import { User } from '../models/users.model';
+import User from '../models/users.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
-class UsersService extends AbstractDal<User> {
+export default class UsersService extends AbstractDal<User> {
   constructor(@InjectRepository(User) private connection: Repository<User>) {
     super();
   }
@@ -19,5 +19,3 @@ class UsersService extends AbstractDal<User> {
 
   includes = ['tokens'];
 }
-
-export default UsersService;

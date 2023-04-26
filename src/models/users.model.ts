@@ -1,10 +1,11 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Token } from './token.model';
+import Token from './token.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import IEntity from 'src/interfaces/entity.interface';
 
 @Entity()
-export class User {
+export default class User implements IEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

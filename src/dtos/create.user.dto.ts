@@ -1,7 +1,7 @@
 import { IsString, IsNotEmpty, IsEmail } from 'class-validator';
-import { LoginUserDto } from './login.user.dto';
+import LoginUserDto from './login.user.dto';
 
-export class CreateUserDto extends LoginUserDto {
+export default class CreateUserDto extends LoginUserDto {
   @IsString()
   @IsNotEmpty()
   public username: string;

@@ -1,23 +1,23 @@
 import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from '../dtos/login.user.dto';
+import LoginUserDto from '../dtos/login.user.dto';
 import { DataStoredInToken } from '../interfaces/auth.interface';
 import { DateTime } from 'luxon';
 import UserService from './users.service';
-import { CreateUserDto } from '../dtos/create.user.dto';
-import { LogoutUserDto } from '../dtos/logout.user.dto';
-import { User } from '../models/users.model';
+import CreateUserDto from '../dtos/create.user.dto';
+import LogoutUserDto from '../dtos/logout.user.dto';
+import User from '../models/users.model';
 import TokenService from './token.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as _ from 'lodash';
-import { Token } from '../models/token.model';
+import Token from '../models/token.model';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import * as ms from 'ms';
 
 @Injectable()
-class AuthService {
+export default class AuthService {
   private readonly salt = 10;
 
   constructor(
@@ -129,5 +129,3 @@ class AuthService {
     );
   }
 }
-
-export default AuthService;

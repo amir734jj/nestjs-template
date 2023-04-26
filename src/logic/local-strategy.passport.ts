@@ -5,7 +5,7 @@ import AuthService from '../services/auth.service';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
-export class LocalStrategy extends PassportStrategy(Strategy) {
+export default class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
     private authService: AuthService,
     private configService: ConfigService,

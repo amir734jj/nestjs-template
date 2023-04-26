@@ -8,15 +8,15 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { LoginUserDto } from '../dtos/login.user.dto';
-import { CreateUserDto } from '../dtos/create.user.dto';
+import LoginUserDto from '../dtos/login.user.dto';
+import CreateUserDto from '../dtos/create.user.dto';
 import AuthService from '../services/auth.service';
-import { JwtAuthGuard } from '../logic/jwt-auth.guard';
+import JwtAuthGuard from '../logic/jwt-auth.guard';
 
 @ApiTags('account')
 @Controller('account')
 @ApiBearerAuth()
-export class AccountController {
+export default class AccountController {
   constructor(private authService: AuthService) {}
 
   @Post('login')

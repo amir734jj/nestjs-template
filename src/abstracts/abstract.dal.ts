@@ -1,7 +1,8 @@
 import { Repository } from 'typeorm';
-import BasicCrud from '../interfaces/crud.interface';
+import IBasicCrud from '../interfaces/crud.interface';
+import IEntity from 'src/interfaces/entity.interface';
 
-export abstract class AbstractDal<T> implements BasicCrud<T> {
+export abstract class AbstractDal<T extends IEntity> implements IBasicCrud<T> {
   abstract repository: Repository<T>;
 
   abstract resolver(partial: Partial<T>): T;
@@ -16,7 +17,7 @@ export abstract class AbstractDal<T> implements BasicCrud<T> {
   }
 
   public async get(id: number): Promise<T> {
-    return await this.repository.findOne(id);
+    return await this.repository.findOneBy({ id: 2 });
   }
 
   public async find(props: Partial<T>): Promise<T> {
@@ -31,13 +32,13 @@ export abstract class AbstractDal<T> implements BasicCrud<T> {
     return await this.repository.save(this.resolver(partial));
   }
 
-  public async update(userId: number, partial: Partial<T>): Promise<T> {
-    await this.repository.update(userId, this.resolver(partial));
-    return await this.repository.findOne(userId);
+  public async update(id: number, partial: Partial<T>): Promise<T> {
+    await this.repository.update(id, this.resolver(partial));
+    return await this.repository.findOneBy({ id });
   }
 
   public async delete(id: number): Promise<T> {
-    const user = this.repository.findOne(id);
+    const user = this.repository.findOneBy({ id });
     await this.repository.delete(id);
     return user;
   }

@@ -1,4 +1,4 @@
-export default interface BasicCrud<T> {
+export default interface IBasicCrud<T> {
   get(id: number): Promise<T>;
 
   all(): Promise<T[]>;
