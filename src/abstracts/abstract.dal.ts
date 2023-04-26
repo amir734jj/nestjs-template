@@ -17,7 +17,7 @@ export abstract class AbstractDal<T extends IEntity> implements IBasicCrud<T> {
   }
 
   public async get(id: number): Promise<T> {
-    return await this.repository.findOneBy({ id: 2 });
+    return await this.repository.findOneBy({ id });
   }
 
   public async find(props: Partial<T>): Promise<T> {
