@@ -15,6 +15,6 @@ export default class Token implements IEntity {
   @Column({})
   expiresIn: Date;
 
-  @ManyToOne((type) => User, (user) => user.tokens)
+  @ManyToOne(() => User, (user) => user.tokens)
   user: User;
 }

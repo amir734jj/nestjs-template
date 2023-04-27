@@ -23,6 +23,6 @@ export default class User implements IEntity {
   password: string;
 
   @ApiProperty()
-  @OneToMany((type) => Token, (token) => token.user)
+  @OneToMany(() => Token, (token) => token.user)
   tokens: Token[];
 }

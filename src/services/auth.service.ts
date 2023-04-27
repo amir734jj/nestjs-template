@@ -12,19 +12,18 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import * as _ from 'lodash';
 import Token from '../models/token.model';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import * as ms from 'ms';
+import ms from 'ms';
+import random from 'random';
 
 @Injectable()
 export default class AuthService {
   private readonly salt = 10;
 
   constructor(
-    private userService: UserService,
-    private tokenService: TokenService,
-    private jwtService: JwtService,
-    private configService: ConfigService,
+    private readonly userService: UserService,
+    private readonly tokenService: TokenService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   public async register(userData: CreateUserDto): Promise<User> {
@@ -34,7 +33,7 @@ export default class AuthService {
     });
   }
 
-  public async login(loginUserDto: LoginUserDto): Promise<string> {
+  public async login(loginUserDto: LoginUserDto): Promise<string | null> {
     const user = await this.userService.find({
       username: loginUserDto.username,
     });
@@ -45,7 +44,9 @@ export default class AuthService {
         value: token,
         expiresIn: DateTime.local()
           .plus({
-            millisecond: ms(this.configService.get<string>('JWT_EXPIRES')),
+            millisecond: ms(
+              this.configService.getOrThrow<string>('JWT_EXPIRES'),
+            ),
           })
           .toJSDate(),
         user,
@@ -62,21 +63,25 @@ export default class AuthService {
     return null;
   }
 
-  public async logout(logoutUserDto: LogoutUserDto): Promise<User> {
+  public async logout(logoutUserDto: LogoutUserDto): Promise<User | null> {
     const token = await this.tokenService.find({ value: logoutUserDto.token });
-    const user = await this.userService.find({ id: token.user.id });
-    await this.tokenService.delete(token.id);
+    if (token) {
+      const user = await this.userService.find({ id: token.user.id });
+      await this.tokenService.delete(token.id);
 
-    return user;
+      return user;
+    }
+
+    return null;
   }
 
   public async challenge({
     id,
     token,
     username,
-  }: DataStoredInToken): Promise<User> {
+  }: DataStoredInToken): Promise<User | null> {
     const user = await this.userService.find({ id, username });
-    let tk: Token;
+    let tk: Token | undefined;
     if (user && (tk = user.tokens.find((x) => x.value === token))) {
       const minutesToExpire = DateTime.fromJSDate(tk.expiresIn)
         .diff(DateTime.local())
@@ -108,7 +113,7 @@ export default class AuthService {
   private async createUniqueToken(user: User): Promise<string> {
     return await bcrypt.hash(
       _.toString({
-        random: Math.random(), // hacky
+        random: random.float(),
         username: user.username,
         password: user.password,
       }),
@@ -125,7 +130,7 @@ export default class AuthService {
               .diff(DateTime.local())
               .as('minutes') < 0,
         )
-        .map((x) => this.tokenService.delete(x.id)),
+        .map(async (x) => await this.tokenService.delete(x.id)),
     );
   }
 }

@@ -17,7 +17,7 @@ import JwtAuthGuard from '../logic/jwt-auth.guard';
 @Controller('account')
 @ApiBearerAuth()
 export default class AccountController {
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('login')
   @ApiResponse({

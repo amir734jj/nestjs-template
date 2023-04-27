@@ -7,8 +7,8 @@ import { ConfigService } from '@nestjs/config';
 @Injectable()
 export default class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(
-    private authService: AuthService,
-    private configService: ConfigService,
+    private readonly authService: AuthService,
+    private readonly configService: ConfigService,
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

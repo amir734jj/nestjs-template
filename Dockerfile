@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:lts
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -15,5 +15,5 @@ RUN npm run build
 # Bundle app source
 COPY . .
 
-EXPOSE 3000 80 443
+EXPOSE 80 443
 CMD [ "npm", "run", "start:prod"]

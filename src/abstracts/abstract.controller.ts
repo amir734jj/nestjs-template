@@ -9,10 +9,10 @@ import {
   Put,
 } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import BasiCrud from '../interfaces/crud.interface';
+import BasicCrud from '../interfaces/crud.interface';
 
 export abstract class AbstractController<T> {
-  abstract service: BasiCrud<T>;
+  abstract service: BasicCrud<T>;
 
   @Get(':id')
   @ApiResponse({

@@ -11,7 +11,7 @@ import JwtAuthGuard from '../logic/jwt-auth.guard';
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth()
 export default class UserController extends AbstractController<User> {
-  constructor(private usersService: UsersService) {
+  constructor(private readonly usersService: UsersService) {
     super();
   }
 
