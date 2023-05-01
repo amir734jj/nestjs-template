@@ -26,6 +26,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         } else {
           return {
             ...defaultOptions,
+            cache: true,
             type: 'postgres',
             url: configService.get<string>('DATABASE_URL'),
             extra: {

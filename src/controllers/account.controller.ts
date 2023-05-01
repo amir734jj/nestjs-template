@@ -5,13 +5,20 @@ import {
   Post,
   UseGuards,
   Body,
-  BadRequestException,
+  BadRequestException, Response, HttpStatus,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiBearerAuth,
+  ApiForbiddenResponse,
+  ApiOkResponse,
+  ApiTags
+} from '@nestjs/swagger';
 import LoginUserDto from '../dtos/login.user.dto';
 import CreateUserDto from '../dtos/create.user.dto';
 import AuthService from '../services/auth.service';
 import JwtAuthGuard from '../logic/jwt-auth.guard';
+import User from "../models/users.model";
 
 @ApiTags('account')
 @Controller('account')
@@ -20,11 +27,11 @@ export default class AccountController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('login')
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully logged out',
   })
-  async login(@Body() login: LoginUserDto): Promise<any> {
+  @ApiBadRequestResponse({ description: 'Bad request.'})
+  async login(@Body() login: LoginUserDto, @Response() res: Response): Promise<string> {
     const response = await this.authService.login(login);
 
     if (!response) {
@@ -35,11 +42,11 @@ export default class AccountController {
   }
 
   @Post('register')
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully registered',
   })
-  async register(@Body() register: CreateUserDto): Promise<any> {
+  @ApiBadRequestResponse({ description: 'Bad request.'})
+  async register(@Body() register: CreateUserDto): Promise<User> {
     const response = await this.authService.register(register);
 
     if (!response) {
@@ -51,24 +58,32 @@ export default class AccountController {
 
   @UseGuards(JwtAuthGuard)
   @Get('logout')
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully logged out',
   })
-  async logout(@Request() req): Promise<any> {
-    return await this.authService.logout(req.user);
+  @ApiForbiddenResponse({  description: 'Forbidden.'})
+  async logout(@Request() req): Promise<User> {
+    return (await this.authService.logout(req.user))!;
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('refresh')
-  async refreshToken(@Request() req) {
+  @ApiOkResponse({
+    description: 'Successfully logged out',
+  })
+  @ApiForbiddenResponse({  description: 'Forbidden.'})
+  async refreshToken(@Request() req): Promise<User> {
     await this.authService.refreshToken(req.token);
     return req.user;
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
+  @ApiOkResponse({
+    description: 'Successfully logged out',
+  })
+  @ApiBadRequestResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden.'})
+  getProfile(@Request() req): Promise<User> {
     return req.user;
   }
 }

@@ -24,10 +24,10 @@ async function bootstrap() {
     .addBearerAuth()
     .build();
 
+  const port = config.get<number>('PORT') || 3000;
+
   const document = SwaggerModule.createDocument(app, options);
   SwaggerModule.setup('swagger', app, document);
-
-  const port = config.get<number>('PORT') || 3000;
 
   Logger.log(`Starting the app in port ${port}`);
 

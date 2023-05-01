@@ -6,6 +6,7 @@ import IEntity from 'src/interfaces/entity.interface';
 
 @Entity()
 export default class User implements IEntity {
+  @ApiProperty()
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -18,11 +19,9 @@ export default class User implements IEntity {
   username: string;
 
   @Exclude()
-  @ApiProperty()
   @Column({ length: 256 })
   password: string;
 
-  @ApiProperty()
   @OneToMany(() => Token, (token) => token.user)
   tokens: Token[];
 }

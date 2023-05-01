@@ -13,7 +13,7 @@ import { ConfigService } from '@nestjs/config';
 import * as _ from 'lodash';
 import Token from '../models/token.model';
 import ms from 'ms';
-import random from 'random';
+import { nanoid } from 'nanoid'
 
 @Injectable()
 export default class AuthService {
@@ -113,7 +113,7 @@ export default class AuthService {
   private async createUniqueToken(user: User): Promise<string> {
     return await bcrypt.hash(
       _.toString({
-        random: random.float(),
+        random: nanoid(),
         username: user.username,
         password: user.password,
       }),

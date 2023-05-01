@@ -2,23 +2,22 @@ import {
   BadRequestException,
   Body,
   Delete,
-  Get,
-  NotFoundException,
+  Get, NotFoundException,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import {ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse} from '@nestjs/swagger';
 import BasicCrud from '../interfaces/crud.interface';
 
 export abstract class AbstractController<T> {
   abstract service: BasicCrud<T>;
 
   @Get(':id')
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully returned a matching record',
   })
+  @ApiBadRequestResponse({ description: 'Bad request.'})
   async get(@Param('id') id: number): Promise<T> {
     const result = await this.service.get(id);
 
@@ -30,8 +29,7 @@ export abstract class AbstractController<T> {
   }
 
   @Get()
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully returned all matching record',
   })
   async getAll(): Promise<T[]> {
@@ -39,8 +37,7 @@ export abstract class AbstractController<T> {
   }
 
   @Delete(':id')
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully deleted a matching record',
   })
   async delete(@Param('id') id: number): Promise<T> {
@@ -54,7 +51,7 @@ export abstract class AbstractController<T> {
   }
 
   @Post()
-  @ApiResponse({ status: 201, description: 'Successfully saved a new record' })
+  @ApiCreatedResponse({ description: 'Successfully saved a new record' })
   async save(@Body() question: T): Promise<T> {
     const result = await this.service.save(question);
 
@@ -66,8 +63,7 @@ export abstract class AbstractController<T> {
   }
 
   @Put(':id')
-  @ApiResponse({
-    status: 200,
+  @ApiOkResponse({
     description: 'Successfully updated matching record',
   })
   async update(@Param('id') id: number, @Body() question: T): Promise<T> {
