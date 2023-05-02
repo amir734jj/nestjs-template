@@ -69,9 +69,12 @@ export default class AccountController {
   @UseGuards(JwtAuthGuard)
   @Post('refresh')
   @ApiOkResponse({
-    description: 'Successfully logged out',
+    description: 'Successfully generated a new JWT token',
   })
   @ApiForbiddenResponse({ description: 'Forbidden.' })
+  @ApiBadRequestResponse({
+    description: 'Failed to generate new JWT token',
+  })
   async refreshToken(@Request() req): Promise<string> {
     return await this.authService.refreshToken(req.user);
   }
@@ -79,7 +82,7 @@ export default class AccountController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   @ApiOkResponse({
-    description: 'Successfully logged out',
+    description: 'Successfully returned the user profile',
   })
   @ApiForbiddenResponse({
     status: HttpStatus.FORBIDDEN,

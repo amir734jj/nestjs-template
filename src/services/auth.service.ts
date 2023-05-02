@@ -7,7 +7,7 @@ import CreateUserDto from '../dtos/create.user.dto';
 import LogoutUserDto from '../dtos/logout.user.dto';
 import User from '../models/users.model';
 import TokenService from './token.service';
-import {Injectable, Logger} from '@nestjs/common';
+import {BadRequestException, Injectable, Logger} from '@nestjs/common';
 import {JwtService} from '@nestjs/jwt';
 import {ConfigService} from '@nestjs/config';
 import * as _ from 'lodash';
@@ -93,6 +93,10 @@ export default class AuthService {
   }
 
   public async refreshToken(user: User): Promise<string> {
+    if (user.tokens.length >= 10) {
+      throw new BadRequestException("User cannot have more than 10 active JWT tokens.")
+    }
+
     const jwtToken = await this.createUniqueToken(user);
 
     const newToken = await this.tokenService.save({
@@ -125,7 +129,7 @@ export default class AuthService {
 
     switch (role) {
       case UserRole.ADMIN:
-        return this.setUserRoles(user, BASIC_ROLE);
+        return this.setUserRoles(user, BASIC_ROLE, ADMIN_ROLE);
       case UserRole.BASIC:
         return this.setUserRoles(user, BASIC_ROLE);
     }
@@ -143,7 +147,7 @@ export default class AuthService {
     user.roles = user.roles.filter(role => !extraRoles.includes(role.name));
     user.roles = user.roles.concat(await Promise.all(missingRoles.map(role => this.getOrCreateRole(role))));
 
-    // its counterintuitive but we need to use save:
+    // its counterintuitive but we need to use save (instead of update):
     // https://orkhan.gitbook.io/typeorm/docs/many-to-many-relations#deleting-many-to-many-relations
     return await this.userService.save(user);
   }
