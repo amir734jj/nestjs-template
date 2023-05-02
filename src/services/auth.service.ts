@@ -16,6 +16,8 @@ import ms from 'ms';
 import {nanoid} from 'nanoid';
 import RoleService from "./role.service";
 import Role from "../models/roles.model";
+import {ADMIN_ROLE, BASIC_ROLE} from "../constants/role.constant";
+import {UserRole} from "../enums/role.enum";
 
 @Injectable()
 export default class AuthService {
@@ -31,10 +33,10 @@ export default class AuthService {
 
   public async register(userData: CreateUserDto): Promise<User> {
     const users = await this.userService.all();
-    let roles = ['basic'];
+    let roles = [BASIC_ROLE];
 
     if (!users.length) {
-      roles.push('admin');
+      roles.push(ADMIN_ROLE);
     }
 
     return await this.userService.save({
@@ -44,14 +46,6 @@ export default class AuthService {
     });
   }
 
-  private async getOrCreateRole(name: string): Promise<Role> {
-    const role = await this.roleService.find({ name });
-    if (role) {
-      return role;
-    } else {
-      return await this.roleService.save({ name });
-    }
-  }
 
   public async login(loginUserDto: LoginUserDto): Promise<string | null> {
     const user = await this.userService.find({
@@ -118,6 +112,49 @@ export default class AuthService {
     Logger.log('Token successfully refreshed');
 
     return result;
+  }
+
+  public async setUserRole(userId: number, role: UserRole): Promise<User | null> {
+    const user = await this.userService.get(userId);
+
+    if (!user) {
+      Logger.log('Failed to find the user {}', userId);
+
+      return null;
+    }
+
+    switch (role) {
+      case UserRole.ADMIN:
+        return this.setUserRoles(user, BASIC_ROLE);
+      case UserRole.BASIC:
+        return this.setUserRoles(user, BASIC_ROLE);
+    }
+  }
+
+  private async setUserRoles(user: User, ...roles: string[]): Promise<User | null> {
+    const extraRoles = _.chain(user.roles)
+        .map(r => r.name)
+        .difference(roles)
+        .value();
+    const missingRoles = _.chain(roles)
+        .differenceWith(user.roles, (value, role) => value === role.name)
+        .value();
+
+    user.roles = user.roles.filter(role => !extraRoles.includes(role.name));
+    user.roles = user.roles.concat(await Promise.all(missingRoles.map(role => this.getOrCreateRole(role))));
+
+    // its counterintuitive but we need to use save:
+    // https://orkhan.gitbook.io/typeorm/docs/many-to-many-relations#deleting-many-to-many-relations
+    return await this.userService.save(user);
+  }
+
+  private async getOrCreateRole(name: string): Promise<Role> {
+    const role = await this.roleService.find({ name });
+    if (role) {
+      return role;
+    } else {
+      return await this.roleService.save({ name });
+    }
   }
 
   private async createUniqueToken(user: User): Promise<string> {

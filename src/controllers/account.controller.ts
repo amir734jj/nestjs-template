@@ -12,8 +12,7 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiForbiddenResponse,
-  ApiOkResponse,
-  ApiTags,
+  ApiOkResponse, ApiTags,
 } from '@nestjs/swagger';
 import LoginUserDto from '../dtos/login.user.dto';
 import CreateUserDto from '../dtos/create.user.dto';
@@ -82,11 +81,11 @@ export default class AccountController {
   @ApiOkResponse({
     description: 'Successfully logged out',
   })
-  @ApiBadRequestResponse({
+  @ApiForbiddenResponse({
     status: HttpStatus.FORBIDDEN,
     description: 'Forbidden.',
   })
-  getProfile(@Request() req): Promise<User> {
+  async getProfile(@Request() req): Promise<User> {
     return req.user;
   }
 }
