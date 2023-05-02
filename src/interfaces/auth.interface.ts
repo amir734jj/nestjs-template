@@ -1,5 +1,7 @@
 export interface DataStoredInToken {
-  id: number;
+  tokenId: number;
+
+  userId: number;
 
   username: string;
 

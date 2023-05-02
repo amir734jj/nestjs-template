@@ -3,6 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import AuthService from '../services/auth.service';
 import { ConfigService } from '@nestjs/config';
+import { DataStoredInToken } from '../interfaces/auth.interface';
+import User from '../models/users.model';
 
 @Injectable()
 export default class LocalStrategy extends PassportStrategy(Strategy) {
@@ -18,7 +20,7 @@ export default class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   // noinspection JSUnusedGlobalSymbols
-  async validate(payload: any): Promise<any> {
+  async validate(payload: DataStoredInToken): Promise<User> {
     const user = await this.authService.challenge(payload);
     if (!user) {
       throw new UnauthorizedException();

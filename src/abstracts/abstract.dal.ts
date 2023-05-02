@@ -1,7 +1,7 @@
-import {FindOneOptions, FindOptionsWhere, Repository} from 'typeorm';
+import { FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 import IBasicCrud from '../interfaces/crud.interface';
 import IEntity from 'src/interfaces/entity.interface';
-import {QueryDeepPartialEntity} from "typeorm/query-builder/QueryPartialEntity";
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export abstract class AbstractDal<T extends IEntity> implements IBasicCrud<T> {
   abstract repository: Repository<T>;
@@ -19,7 +19,7 @@ export abstract class AbstractDal<T extends IEntity> implements IBasicCrud<T> {
 
   public async get(id: number): Promise<T | null> {
     return await this.repository.findOne({
-      where: { id},
+      where: { id },
       relations: this.includes,
     } as FindOneOptions<T>);
   }
@@ -36,7 +36,10 @@ export abstract class AbstractDal<T extends IEntity> implements IBasicCrud<T> {
   }
 
   public async update(id: number, partial: Partial<T>): Promise<T | null> {
-    await this.repository.update(id, this.resolver(partial) as QueryDeepPartialEntity<T>);
+    await this.repository.update(
+      id,
+      this.resolver(partial) as QueryDeepPartialEntity<T>,
+    );
     return await this.repository.findOneBy({ id } as FindOptionsWhere<T>);
   }
 

@@ -2,12 +2,17 @@ import {
   BadRequestException,
   Body,
   Delete,
-  Get, NotFoundException,
+  Get,
+  NotFoundException,
   Param,
   Post,
   Put,
 } from '@nestjs/common';
-import {ApiBadRequestResponse, ApiCreatedResponse, ApiOkResponse} from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiCreatedResponse,
+  ApiOkResponse,
+} from '@nestjs/swagger';
 import BasicCrud from '../interfaces/crud.interface';
 
 export abstract class AbstractController<T> {
@@ -17,7 +22,7 @@ export abstract class AbstractController<T> {
   @ApiOkResponse({
     description: 'Successfully returned a matching record',
   })
-  @ApiBadRequestResponse({ description: 'Bad request.'})
+  @ApiBadRequestResponse({ description: 'Bad request.' })
   async get(@Param('id') id: number): Promise<T> {
     const result = await this.service.get(id);
 

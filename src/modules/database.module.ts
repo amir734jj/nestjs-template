@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import Token from '../models/token.model';
 import User from '../models/users.model';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import Role from "../models/roles.model";
 
 @Module({
   imports: [
@@ -11,10 +12,11 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const defaultOptions = {
-          entities: [Token, User],
           synchronize: true,
-          migrationsRun: true,
+          migrationsRun: false,
           logging: false,
+          autoLoadEntities: true,
+          cache: true,
         };
 
         if (configService.get<string>('ENV') === 'Development') {
@@ -26,7 +28,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         } else {
           return {
             ...defaultOptions,
-            cache: true,
             type: 'postgres',
             url: configService.get<string>('DATABASE_URL'),
             extra: {

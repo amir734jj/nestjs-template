@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import User from '../models/users.model';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {AbstractDal} from "../abstracts/abstract.dal";
+import { AbstractDal } from '../abstracts/abstract.dal';
 
 @Injectable()
 export default class UsersService extends AbstractDal<User> {
@@ -19,5 +19,5 @@ export default class UsersService extends AbstractDal<User> {
 
   repository: Repository<User> = this.connection;
 
-  override includes = ['tokens'];
+  override includes = ['tokens', 'roles'];
 }
