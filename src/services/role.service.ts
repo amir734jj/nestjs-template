@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AbstractDal } from '../abstracts/abstract.dal';
-import Role from "../models/roles.model";
+import Role from '../models/roles.model';
 
 @Injectable()
 export default class RoleService extends AbstractDal<Role> {

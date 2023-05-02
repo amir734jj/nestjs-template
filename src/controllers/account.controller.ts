@@ -12,7 +12,8 @@ import {
   ApiBadRequestResponse,
   ApiBearerAuth,
   ApiForbiddenResponse,
-  ApiOkResponse, ApiTags,
+  ApiOkResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import LoginUserDto from '../dtos/login.user.dto';
 import CreateUserDto from '../dtos/create.user.dto';

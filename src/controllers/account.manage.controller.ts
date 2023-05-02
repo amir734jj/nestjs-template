@@ -1,21 +1,18 @@
-import {
-  Controller,
-  UseGuards,
-  Param, Put,
-} from '@nestjs/common';
+import { Controller, UseGuards, Param, Put } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
-  ApiOkResponse, ApiParam,
+  ApiOkResponse,
+  ApiParam,
   ApiTags,
 } from '@nestjs/swagger';
 import AuthService from '../services/auth.service';
 import JwtAuthGuard from '../logic/jwt-auth.guard';
 import User from '../models/users.model';
-import {RolesGuard} from "../guards/roles.guard";
-import {Roles} from "../decorators/roles.decorator";
-import {UserRole} from "../enums/role.enum";
-import {ADMIN_ROLE} from "../constants/role.constant";
+import { RolesGuard } from '../guards/roles.guard';
+import { Roles } from '../decorators/roles.decorator';
+import { UserRole } from '../enums/role.enum';
+import { ADMIN_ROLE } from '../constants/role.constant';
 
 @ApiTags('manage_account')
 @Controller('manage/account')
@@ -35,7 +32,10 @@ export default class ManageAccountController {
   @ApiForbiddenResponse({
     description: 'Forbidden.',
   })
-  async setUserRole(@Param('id') userId: number, @Param('role') role: UserRole): Promise<User | null> {
+  async setUserRole(
+    @Param('id') userId: number,
+    @Param('role') role: UserRole,
+  ): Promise<User | null> {
     return await this.authService.setUserRole(userId, role);
   }
 }

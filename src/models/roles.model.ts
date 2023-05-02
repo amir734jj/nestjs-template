@@ -1,10 +1,16 @@
-import {Entity, PrimaryGeneratedColumn, Column, Unique, ManyToMany} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  Unique,
+  ManyToMany,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import IEntity from 'src/interfaces/entity.interface';
-import User from "./users.model";
+import User from './users.model';
 
 @Entity()
-@Unique(["name"])
+@Unique(['name'])
 export default class Role implements IEntity {
   @ApiProperty()
   @PrimaryGeneratedColumn()

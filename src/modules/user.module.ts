@@ -5,8 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import User from '../models/users.model';
 import Token from '../models/token.model';
 import TokenService from '../services/token.service';
-import RoleService from "../services/role.service";
-import Role from "../models/roles.model";
+import RoleService from '../services/role.service';
+import Role from '../models/roles.model';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, Token, Role])],

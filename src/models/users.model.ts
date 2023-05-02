@@ -1,12 +1,20 @@
-import {Entity, PrimaryGeneratedColumn, Column, OneToMany, Unique, ManyToMany, JoinTable} from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  Unique,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 import Token from './token.model';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import IEntity from 'src/interfaces/entity.interface';
-import Role from "./roles.model";
+import Role from './roles.model';
 
 @Entity()
-@Unique(["username"])
+@Unique(['username'])
 export default class User implements IEntity {
   @ApiProperty()
   @PrimaryGeneratedColumn()

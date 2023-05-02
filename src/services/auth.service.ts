@@ -1,23 +1,23 @@
 import * as bcrypt from 'bcrypt';
 import LoginUserDto from '../dtos/login.user.dto';
-import {DataStoredInToken} from '../interfaces/auth.interface';
-import {DateTime} from 'luxon';
+import { DataStoredInToken } from '../interfaces/auth.interface';
+import { DateTime } from 'luxon';
 import UserService from './users.service';
 import CreateUserDto from '../dtos/create.user.dto';
 import LogoutUserDto from '../dtos/logout.user.dto';
 import User from '../models/users.model';
 import TokenService from './token.service';
-import {BadRequestException, Injectable, Logger} from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
-import {ConfigService} from '@nestjs/config';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 import * as _ from 'lodash';
 import Token from '../models/token.model';
 import ms from 'ms';
-import {nanoid} from 'nanoid';
-import RoleService from "./role.service";
-import Role from "../models/roles.model";
-import {ADMIN_ROLE, BASIC_ROLE} from "../constants/role.constant";
-import {UserRole} from "../enums/role.enum";
+import { nanoid } from 'nanoid';
+import RoleService from './role.service';
+import Role from '../models/roles.model';
+import { ADMIN_ROLE, BASIC_ROLE } from '../constants/role.constant';
+import { UserRole } from '../enums/role.enum';
 
 @Injectable()
 export default class AuthService {
@@ -33,7 +33,7 @@ export default class AuthService {
 
   public async register(userData: CreateUserDto): Promise<User> {
     const users = await this.userService.all();
-    let roles = [BASIC_ROLE];
+    const roles = [BASIC_ROLE];
 
     if (!users.length) {
       roles.push(ADMIN_ROLE);
@@ -42,10 +42,9 @@ export default class AuthService {
     return await this.userService.save({
       ...userData,
       password: await bcrypt.hash(userData.password, this.salt),
-      roles: await Promise.all(roles.map(role => this.getOrCreateRole(role)))
+      roles: await Promise.all(roles.map((role) => this.getOrCreateRole(role))),
     });
   }
-
 
   public async login(loginUserDto: LoginUserDto): Promise<string | null> {
     const user = await this.userService.find({
@@ -75,7 +74,10 @@ export default class AuthService {
     tokenId,
     token: jwtToken,
   }: DataStoredInToken): Promise<User | null> {
-    const token = await this.tokenService.find({ id: tokenId, value: jwtToken });
+    const token = await this.tokenService.find({
+      id: tokenId,
+      value: jwtToken,
+    });
     if (token) {
       const minutesToExpire = DateTime.fromJSDate(token.expiresIn)
         .diff(DateTime.local())
@@ -94,7 +96,9 @@ export default class AuthService {
 
   public async refreshToken(user: User): Promise<string> {
     if (user.tokens.length >= 10) {
-      throw new BadRequestException("User cannot have more than 10 active JWT tokens.")
+      throw new BadRequestException(
+        'User cannot have more than 10 active JWT tokens.',
+      );
     }
 
     const jwtToken = await this.createUniqueToken(user);
@@ -105,20 +109,25 @@ export default class AuthService {
       expiresIn: DateTime.local()
         .plus({
           milliseconds: ms(
-              this.configService.getOrThrow<string>('JWT_EXPIRES'),
+            this.configService.getOrThrow<string>('JWT_EXPIRES'),
           ),
         })
         .toJSDate(),
     });
 
-    const result=  await this.jwtService.signAsync(this.createTokenPayload(newToken.user, newToken));
+    const result = await this.jwtService.signAsync(
+      this.createTokenPayload(newToken.user, newToken),
+    );
 
     Logger.log('Token successfully refreshed');
 
     return result;
   }
 
-  public async setUserRole(userId: number, role: UserRole): Promise<User | null> {
+  public async setUserRole(
+    userId: number,
+    role: UserRole,
+  ): Promise<User | null> {
     const user = await this.userService.get(userId);
 
     if (!user) {
@@ -135,17 +144,22 @@ export default class AuthService {
     }
   }
 
-  private async setUserRoles(user: User, ...roles: string[]): Promise<User | null> {
+  private async setUserRoles(
+    user: User,
+    ...roles: string[]
+  ): Promise<User | null> {
     const extraRoles = _.chain(user.roles)
-        .map(r => r.name)
-        .difference(roles)
-        .value();
+      .map((r) => r.name)
+      .difference(roles)
+      .value();
     const missingRoles = _.chain(roles)
-        .differenceWith(user.roles, (value, role) => value === role.name)
-        .value();
+      .differenceWith(user.roles, (value, role) => value === role.name)
+      .value();
 
-    user.roles = user.roles.filter(role => !extraRoles.includes(role.name));
-    user.roles = user.roles.concat(await Promise.all(missingRoles.map(role => this.getOrCreateRole(role))));
+    user.roles = user.roles.filter((role) => !extraRoles.includes(role.name));
+    user.roles = user.roles.concat(
+      await Promise.all(missingRoles.map((role) => this.getOrCreateRole(role))),
+    );
 
     // its counterintuitive but we need to use save (instead of update):
     // https://orkhan.gitbook.io/typeorm/docs/many-to-many-relations#deleting-many-to-many-relations

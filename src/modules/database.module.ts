@@ -1,9 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import Token from '../models/token.model';
-import User from '../models/users.model';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import Role from "../models/roles.model";
 
 @Module({
   imports: [
