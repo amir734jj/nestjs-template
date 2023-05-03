@@ -3,6 +3,10 @@ export default interface IBasicCrud<T> {
 
   all: () => Promise<T[]>;
 
+  find(props: Partial<T>): Promise<T | null>;
+
+  findMany(props: Partial<T>): Promise<T[]>
+
   delete: (id: number) => Promise<T | null>;
 
   save: (instance: Partial<T>) => Promise<T>;

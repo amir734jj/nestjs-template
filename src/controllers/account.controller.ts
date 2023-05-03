@@ -18,7 +18,7 @@ import {
 import LoginUserDto from '../dtos/login.user.dto';
 import CreateUserDto from '../dtos/create.user.dto';
 import AuthService from '../services/auth.service';
-import JwtAuthGuard from '../logic/jwt-auth.guard';
+import JwtAuthGuard from '../guards/jwt-auth.guard';
 import User from '../models/users.model';
 
 @ApiTags('account')

@@ -4,7 +4,6 @@ import { DataStoredInToken } from '../interfaces/auth.interface';
 import { DateTime } from 'luxon';
 import UserService from './users.service';
 import CreateUserDto from '../dtos/create.user.dto';
-import LogoutUserDto from '../dtos/logout.user.dto';
 import User from '../models/users.model';
 import TokenService from './token.service';
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
@@ -47,27 +46,25 @@ export default class AuthService {
   }
 
   public async login(loginUserDto: LoginUserDto): Promise<string | null> {
-    const user = await this.userService.find({
+    let user = await this.userService.find({
       username: loginUserDto.username,
     });
     if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
       // clean up old expired tokens of this user
-      await this.cleanUpUniqueTokens(user.tokens);
+      // if there was a change, then we need to refresh the user
+      if (await this.cleanUpUniqueTokens(user.tokens)) {
+        user = (await this.userService.get(user.id))!;
+      }
 
       return this.refreshToken(user);
     }
     return null;
   }
 
-  public async logout(logoutUserDto: LogoutUserDto): Promise<User | null> {
-    const token = await this.tokenService.find({ value: logoutUserDto.token });
-    if (token) {
-      await this.tokenService.delete(token.id);
+  public async logout(user: User): Promise<User | null> {
+    await Promise.all(user.tokens.map((tk) => this.tokenService.delete(tk.id)));
 
-      return token.user;
-    }
-
-    return null;
+    return this.userService.get(user.id);
   }
 
   public async challenge({
@@ -186,17 +183,20 @@ export default class AuthService {
     );
   }
 
-  private async cleanUpUniqueTokens(tokens: Token[]) {
-    await Promise.all(
-      tokens
-        .filter(
-          ({ expiresIn }) =>
-            DateTime.fromJSDate(expiresIn)
-              .diff(DateTime.local())
-              .as('minutes') < 0,
-        )
-        .map(async (x) => await this.tokenService.delete(x.id)),
+  private async cleanUpUniqueTokens(tokens: Token[]): Promise<boolean> {
+    const expiringTokens = tokens.filter(
+      ({ expiresIn }) =>
+        DateTime.fromJSDate(expiresIn).diff(DateTime.local()).as('minutes') < 0,
     );
+
+    if (expiringTokens.length) {
+      await Promise.all(
+        expiringTokens.map(async (x) => await this.tokenService.delete(x.id)),
+      );
+      return true;
+    }
+
+    return false;
   }
 
   private createTokenPayload(user: User, token: Token): DataStoredInToken {

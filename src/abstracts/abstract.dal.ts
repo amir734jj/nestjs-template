@@ -31,6 +31,13 @@ export abstract class AbstractDal<T extends IEntity> implements IBasicCrud<T> {
     } as FindOneOptions<T>);
   }
 
+  public async findMany(props: Partial<T>): Promise<T[]> {
+    return await this.repository.find({
+      where: props,
+      relations: this.includes,
+    } as FindOneOptions<T>);
+  }
+
   public async save(partial: Partial<T>): Promise<T> {
     return await this.repository.save(this.resolver(partial));
   }

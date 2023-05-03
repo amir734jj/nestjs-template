@@ -2,6 +2,7 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import User from '../models/users.model';
 import * as _ from 'lodash';
+import { USER_ROLES } from '../constants/role.constant';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -9,9 +10,9 @@ export class RolesGuard implements CanActivate {
 
   canActivate(context: ExecutionContext): boolean {
     const actionRoles =
-      this.reflector.get<string[]>('roles', context.getHandler()) || [];
+      this.reflector.get<string[]>(USER_ROLES, context.getHandler()) || [];
     const classRoles =
-      this.reflector.get<string[]>('roles', context.getClass()) || [];
+      this.reflector.get<string[]>(USER_ROLES, context.getClass()) || [];
 
     if (!actionRoles.length && !classRoles.length) {
       return true;

@@ -18,6 +18,4 @@ export default class RoleService extends AbstractDal<Role> {
   resolver(partial: Partial<Role>): Role {
     return _.extend(new Role(), partial);
   }
-
-  override includes = [];
 }
