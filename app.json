@@ -1,6 +1,6 @@
 {
   "name": "nestjs-template",
-  "description": "A barebones Node.js app using Nest.js",
+  "description": "Barebone Node.js app using Nest.js",
   "repository": "https://github.com/amir734jj/nestjs-template",
   "keywords": ["node", "nest.js", "typescript"]
 }

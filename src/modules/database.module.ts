@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const defaultOptions = {
+          applicationName: configService.get<string>('APP_NAME'),
           synchronize: true,
           migrationsRun: false,
           logging: false,
@@ -26,7 +27,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           return {
             ...defaultOptions,
             type: 'postgres',
-            url: configService.get<string>('DATABASE_URL'),
+            url: configService.getOrThrow<string>('DATABASE_URL'),
             extra: {
               ssl: true,
             },
