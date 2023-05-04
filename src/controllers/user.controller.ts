@@ -7,11 +7,11 @@ import IBasicCrud from '../interfaces/crud.interface';
 import JwtAuthGuard from '../guards/jwt-auth.guard';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
-import { ADMIN_ROLE } from '../constants/role.constant';
+import { UserRole } from '../enums/role.enum';
 
 @ApiTags('user')
 @Controller('user')
-@Roles(ADMIN_ROLE)
+@Roles(UserRole.ADMIN)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export default class UserController extends AbstractController<User> {

@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Param, Post } from '@nestjs/common';
+import { Controller, Param, Post, UseGuards } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -12,11 +12,10 @@ import User from '../models/users.model';
 import { RolesGuard } from '../guards/roles.guard';
 import { Roles } from '../decorators/roles.decorator';
 import { UserRole } from '../enums/role.enum';
-import { ADMIN_ROLE } from '../constants/role.constant';
 
 @ApiTags('manage_account')
 @Controller('manage/account')
-@Roles(ADMIN_ROLE)
+@Roles(UserRole.ADMIN)
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export default class ManageAccountController {
