@@ -21,6 +21,10 @@ export default class User implements IEntity {
   id: number;
 
   @ApiProperty()
+  @Column()
+  active: boolean;
+
+  @ApiProperty()
   @Column({ length: 256, default: '' })
   name: string;
 

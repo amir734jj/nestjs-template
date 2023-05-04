@@ -31,15 +31,19 @@ export default class AuthService {
   ) {}
 
   public async register(userData: CreateUserDto): Promise<User> {
-    const users = await this.userService.all();
+    const count = await this.userService.count({ active: true });
     const roles = [BASIC_ROLE];
+    let active = false;
 
-    if (!users.length) {
+    // if there is no existing user, then mark this user as admin
+    if (!count) {
       roles.push(ADMIN_ROLE);
+      active = true;
     }
 
     return await this.userService.save({
       ...userData,
+      active,
       password: await bcrypt.hash(userData.password, this.salt),
       roles: await Promise.all(roles.map((role) => this.getOrCreateRole(role))),
     });
@@ -49,7 +53,11 @@ export default class AuthService {
     let user = await this.userService.find({
       username: loginUserDto.username,
     });
-    if (user && (await bcrypt.compare(loginUserDto.password, user.password))) {
+    if (
+      user &&
+      user.active &&
+      (await bcrypt.compare(loginUserDto.password, user.password))
+    ) {
       // clean up old expired tokens of this user
       // if there was a change, then we need to refresh the user
       if (await this.cleanUpUniqueTokens(user.tokens)) {
@@ -119,6 +127,21 @@ export default class AuthService {
     Logger.log('Token successfully refreshed');
 
     return result;
+  }
+
+  public async setUserActive(
+    userId: number,
+    active: boolean,
+  ): Promise<User | null> {
+    const user = await this.userService.get(userId);
+
+    if (!user) {
+      Logger.log('Failed to find the user {}', userId);
+
+      return null;
+    }
+
+    return await this.userService.update(userId, { ...user, active });
   }
 
   public async setUserRole(

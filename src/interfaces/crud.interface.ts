@@ -3,6 +3,8 @@ export default interface IBasicCrud<T> {
 
   all: () => Promise<T[]>;
 
+  count(props: Partial<T>): Promise<number>;
+
   find(props: Partial<T>): Promise<T | null>;
 
   findMany(props: Partial<T>): Promise<T[]>;

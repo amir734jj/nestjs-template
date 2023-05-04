@@ -1,4 +1,4 @@
-import { Controller, UseGuards, Param, Put } from '@nestjs/common';
+import { Controller, UseGuards, Param, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiForbiddenResponse,
@@ -23,7 +23,7 @@ export default class ManageAccountController {
   constructor(private readonly authService: AuthService) {}
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Put(':id/role/:role')
+  @Post(':id/role/:role')
   @ApiParam({ name: 'id', description: 'userId' })
   @ApiParam({ name: 'role', enum: UserRole })
   @ApiOkResponse({
@@ -37,5 +37,22 @@ export default class ManageAccountController {
     @Param('role') role: UserRole,
   ): Promise<User | null> {
     return await this.authService.setUserRole(userId, role);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Post(':id/active/:active')
+  @ApiParam({ name: 'id', description: 'userId' })
+  @ApiParam({ name: 'active', required: true })
+  @ApiOkResponse({
+    description: 'Successfully updated the active',
+  })
+  @ApiForbiddenResponse({
+    description: 'Forbidden.',
+  })
+  async setUserActive(
+    @Param('id') userId: number,
+    @Param('active') active: boolean,
+  ): Promise<User | null> {
+    return await this.authService.setUserActive(userId, active);
   }
 }
