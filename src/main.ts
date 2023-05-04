@@ -8,11 +8,13 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import compression from 'compression';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
 
+  app.use(compression());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
